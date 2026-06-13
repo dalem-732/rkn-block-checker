@@ -410,6 +410,25 @@ For development (adds pytest and friends):
 pip install -e ".[dev]"
 ```
 
+## Android app
+
+This repository also contains a native Android app in `android/app`. It mirrors
+the CLI's DNS -> TCP -> TLS -> HTTP probe flow and exposes two mobile workflows:
+
+- run the built-in whitelist/blacklist check from the device's current network;
+- check one ad-hoc URL or hostname.
+
+Open the repository root in Android Studio, or build from the command line:
+
+```bash
+./gradlew :android:app:assembleDebug
+```
+
+Requirements:
+
+- JDK 17+;
+- Android SDK with API 36 installed.
+
 ## Layout
 
 ```text
@@ -424,6 +443,7 @@ rkn_checker/
   lists.py        # parser for user-supplied target files
   targets.py      # built-in whitelist, blacklist, stub markers
   models.py       # CheckResult, Verdict, Confidence
+android/app/      # native Android app
 tests/            # pytest, all network calls mocked
 ```
 
