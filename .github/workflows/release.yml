@@ -7,6 +7,8 @@ on:
         description: "Release tag to create or update, for example v0.3.3"
         required: true
         default: "v0.3.3"
+  release:
+    types: [published, edited]
   push:
     tags:
       - "v*.*.*"
@@ -15,7 +17,7 @@ permissions:
   contents: read
 
 env:
-  RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+  RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
 
 jobs:
   build:
