@@ -418,13 +418,20 @@ the CLI's DNS -> TCP -> TLS -> HTTP probe flow and exposes two mobile workflows:
 - run the built-in whitelist/blacklist check from the device's current network;
 - check one ad-hoc URL or hostname.
 
-Open the repository root in Android Studio, or build from the command line:
+The repository includes a prebuilt debug APK:
+
+```text
+artifacts/android/rkn-block-checker-debug.apk
+```
+
+Open the repository root in Android Studio, or rebuild the APK from the command
+line:
 
 ```bash
 ./gradlew :android:app:assembleDebug
 ```
 
-The debug APK is written to:
+Rebuilt APKs are written to:
 
 ```text
 android/app/build/outputs/apk/debug/app-debug.apk
@@ -432,12 +439,13 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 ### Using the Android app
 
-1. Build the debug APK with the command above, or press **Run** for the
-   `android:app` configuration in Android Studio.
+1. Use the prebuilt APK from `artifacts/android/rkn-block-checker-debug.apk`,
+   rebuild it with the command above, or press **Run** for the `android:app`
+   configuration in Android Studio.
 2. Install the APK on a device or emulator. For a connected device:
 
    ```bash
-   adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+   adb install -r artifacts/android/rkn-block-checker-debug.apk
    ```
 
 3. Open **RKN Block Checker**.
