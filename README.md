@@ -424,6 +424,10 @@ The repository includes a prebuilt debug APK:
 artifacts/android/rkn-block-checker-debug.apk
 ```
 
+Tagged releases also attach an Android APK to the GitHub Releases page. Look
+for an asset named like `rkn-block-checker-android-v0.3.3-debug.apk` on the
+release you want to install.
+
 Open the repository root in Android Studio, or rebuild the APK from the command
 line:
 
