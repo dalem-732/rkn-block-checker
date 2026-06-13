@@ -46,6 +46,38 @@ jobs:
           name: dist
           path: dist/
 
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Build debug APK
+        run: ./gradlew :android:app:assembleDebug
+
+      - name: Prepare release APK
+        run: |
+          mkdir -p release-assets
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+            "release-assets/rkn-block-checker-android-${GITHUB_REF_NAME}-debug.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: release-assets/*.apk
+
   publish-pypi:
     name: Publish to PyPI
     needs: build
@@ -66,7 +98,7 @@ jobs:
 
   github-release:
     name: Attach artifacts to GitHub Release
-    needs: publish-pypi
+    needs: [publish-pypi, build-android]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -76,9 +108,16 @@ jobs:
           name: dist
           path: dist/
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: android-apk/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
+          files: |
+            dist/*
+            android-apk/*.apk
           generate_release_notes: true
           fail_on_unmatched_files: true

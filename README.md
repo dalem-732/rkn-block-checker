@@ -410,6 +410,66 @@ For development (adds pytest and friends):
 pip install -e ".[dev]"
 ```
 
+## Android app
+
+This repository also contains a native Android app in `android/app`. It mirrors
+the CLI's DNS -> TCP -> TLS -> HTTP probe flow and exposes two mobile workflows:
+
+- run the built-in whitelist/blacklist check from the device's current network;
+- check one ad-hoc URL or hostname.
+
+The repository includes a prebuilt debug APK:
+
+```text
+artifacts/android/rkn-block-checker-debug.apk
+```
+
+Tagged releases also attach an Android APK to the GitHub Releases page. Look
+for an asset named like `rkn-block-checker-android-v0.3.3-debug.apk` on the
+release you want to install.
+
+Open the repository root in Android Studio, or rebuild the APK from the command
+line:
+
+```bash
+./gradlew :android:app:assembleDebug
+```
+
+Rebuilt APKs are written to:
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Using the Android app
+
+1. Use the prebuilt APK from `artifacts/android/rkn-block-checker-debug.apk`,
+   rebuild it with the command above, or press **Run** for the `android:app`
+   configuration in Android Studio.
+2. Install the APK on a device or emulator. For a connected device:
+
+   ```bash
+   adb install -r artifacts/android/rkn-block-checker-debug.apk
+   ```
+
+3. Open **RKN Block Checker**.
+4. Tap **Run built-in check** to probe the built-in whitelist and blacklist
+   from the Android device's current network. The app runs DNS, DoH, TCP, TLS
+   and HTTP checks and updates the result list as probes finish.
+5. To check one site, enter a hostname or URL such as `example.com` or
+   `https://example.com`, then tap **Check URL**. This mode reports only that
+   target and does not produce a network-level whitelist/blacklist verdict.
+
+Result cards show the target group, verdict, confidence, TCP/TLS timings, HTTP
+status and any notes that explain where the probe failed. The final summary is
+the same style of conclusion as the CLI: inconclusive, likely not blocked,
+partial blocks, or likely in an RKN-blocked zone.
+
+Requirements:
+
+- JDK 17+;
+- Android SDK with API 36 installed.
+
 ## Layout
 
 ```text
@@ -424,6 +484,7 @@ rkn_checker/
   lists.py        # parser for user-supplied target files
   targets.py      # built-in whitelist, blacklist, stub markers
   models.py       # CheckResult, Verdict, Confidence
+android/app/      # native Android app
 tests/            # pytest, all network calls mocked
 ```
 

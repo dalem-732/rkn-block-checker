@@ -19,3 +19,10 @@ htmlcov/
 .vscode/
 *.swp
 .DS_Store
+
+# Android / Gradle
+.gradle/
+local.properties
+android/**/build/
+android/**/.cxx/
+captures/
