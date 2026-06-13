@@ -12,6 +12,8 @@ jobs:
   build:
     name: Build sdist and wheel
     runs-on: ubuntu-latest
+    outputs:
+      pypi-version-exists: ${{ steps.pypi-version.outputs.exists }}
     steps:
       - uses: actions/checkout@v4
 
@@ -29,6 +31,34 @@ jobs:
             exit 1
           fi
           echo "Tag and pyproject version match: $PROJ"
+
+      - name: Check whether version already exists on PyPI
+        id: pypi-version
+        run: |
+          export TAG="${GITHUB_REF_NAME#v}"
+          EXISTS=$(python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          version = os.environ["TAG"]
+          try:
+              with urllib.request.urlopen(
+                  "https://pypi.org/pypi/rkn-block-checker/json",
+                  timeout=10,
+              ) as response:
+                  data = json.load(response)
+          except (OSError, urllib.error.URLError, json.JSONDecodeError):
+              print("false")
+          else:
+              print(str(version in data.get("releases", {})).lower())
+          PY
+          )
+          echo "exists=${EXISTS}" >> "$GITHUB_OUTPUT"
+          if [ "$EXISTS" = "true" ]; then
+            echo "Version $TAG already exists on PyPI; PyPI publish job will be skipped."
+          fi
 
       - name: Install build tooling
         run: |
@@ -81,6 +111,7 @@ jobs:
   publish-pypi:
     name: Publish to PyPI
     needs: build
+    if: needs.build.outputs.pypi-version-exists != 'true'
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -98,7 +129,7 @@ jobs:
 
   github-release:
     name: Attach artifacts to GitHub Release
-    needs: [publish-pypi, build-android]
+    needs: [build, build-android]
     runs-on: ubuntu-latest
     permissions:
       contents: write
